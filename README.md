@@ -7,7 +7,7 @@
 
 
 ## Deployment
-### Before using AWS services, you need to do aws envoirnment 'aws configure'
+### Before using AWS services, you need to do aws envoirnment 'aws configure' to setup the environment
 ```
 npm install
 sls deploy -v
