@@ -1,27 +1,48 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import 'source-map-support/register'
-import * as AWS  from 'aws-sdk'
+// no interaction with DynamoDB directly:
+import {
+  APIGatewayProxyHandler,
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+} from "aws-lambda";
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+import "source-map-support/register";
+import { getAllGroups } from "../../businessLogic/groups";
 
-const groupsTable = process.env.GROUPS_TABLE
+// import * as express from "express";
+// import * as awsServerlessExpress from "aws-serverless-express";
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  console.log('Processing event: ', event)
+// const app = express();
 
-  const result = await docClient.scan({
-    TableName: groupsTable
-  }).promise()
+// app.get("/groups", async (_req, res) => {
+//   const groups = await getAllGroups();
 
-  const items = result.Items
+//   res.json({
+//     items: groups,
+//   });
+// });
+
+// const server = awsServerlessExpress.createServer(app);
+// exports.handler = (event, context) => {
+//   awsServerlessExpress.proxy(server, event, context);
+// };
+
+// handler to get all groups:
+export const handler: APIGatewayProxyHandler = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  console.log("Processing event: ", event);
+
+  // get Groups from DynamoDB table:
+  const groups = await getAllGroups();
 
   return {
     statusCode: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*'
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
     },
     body: JSON.stringify({
-      items
-    })
-  }
-}
+      items: groups,
+    }),
+  };
+};
